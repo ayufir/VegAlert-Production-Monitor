@@ -76,67 +76,12 @@ export default function Header({ user = {}, onLogout, selectedBatch, batches = [
           </div>
         </div>
 
-        {/* Batch + Date Row */}
+        {/* Batch + Date Row (Hidden as per request) */}
+        {/* 
         <div className="flex items-center gap-3 pb-3 flex-wrap overflow-x-auto">
-          {/* Date picker */}
-          <div className="relative shrink-0 flex">
-            <label
-              htmlFor="hdr-date"
-              className="flex items-center gap-2 text-sm font-semibold px-4 py-2 rounded-lg border border-white/5 bg-white/5 text-slate-300 hover:bg-white/10 hover:text-white transition cursor-pointer"
-            >
-              📅 <span>{selectedDate || today}</span>
-            </label>
-            <input
-              id="hdr-date"
-              type="date"
-              value={selectedDate || today}
-              max={today}
-              onChange={(e) => e.target.value && onDateChange?.(e.target.value)}
-              onClick={(e) => {
-                try {
-                  e.target.showPicker();
-                } catch (err) {
-                  // Ignore if showPicker is not supported
-                }
-              }}
-              className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-            />
-          </div>
-
-          {/* Batch pills */}
-          <div className="flex items-center gap-1.5 overflow-x-auto">
-            <span className="text-[#A3D61B] opacity-80 text-xs font-bold uppercase tracking-wider shrink-0">Batch:</span>
-            <button
-              onClick={() => onBatchChange?.('ALL')}
-              className={`shrink-0 px-4 py-2 rounded-lg text-sm font-bold transition-all border ${
-                selectedBatch === 'ALL'
-                  ? 'bg-[#A3D61B] border-[#A3D61B] text-[#0A1A12] shadow-sm'
-                  : 'bg-white/5 border-white/5 text-slate-300 hover:bg-white/10 hover:text-white'
-              }`}
-            >
-              All
-            </button>
-            {batches.map((b) => {
-              const bid = String(b.id || b._id)
-              const label = b.name || b.batch_name || b.batch_number || `#${bid}`
-              const slot = b.time_range || b.timeRange || b.slot || ''
-              const isActive = selectedBatch === bid
-              return (
-                <button
-                  key={bid}
-                  onClick={() => onBatchChange?.(bid)}
-                  className={`shrink-0 px-4 py-2 rounded-lg text-sm font-bold transition-all border ${
-                    isActive
-                      ? 'bg-[#A3D61B] border-[#A3D61B] text-[#0A1A12] shadow-sm'
-                      : 'bg-white/5 border-white/5 text-slate-300 hover:bg-white/10 hover:text-white'
-                  }`}
-                >
-                  {label}{slot ? ` · ${slot}` : ''}
-                </button>
-              )
-            })}
-          </div>
+          ...
         </div>
+        */}
       </div>
     </header>
   )
