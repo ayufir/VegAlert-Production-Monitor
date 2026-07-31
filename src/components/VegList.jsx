@@ -39,11 +39,9 @@ export function computeStageTimeline(demand, batchStartMs) {
  *
  * Status rules (in priority order):
  *   'completed' → remaining_quantity === 0
- *   'pending'   → no time data  OR  now < first stage start  OR
- *                  within window but processed_qty === 0 (not started yet)
- *   'running'   → within a stage window  AND  processed_qty > 0
- *                  (worker has actually started)  OR  mobile timer active
- *   'delayed'   → past ALL stage windows  AND  remaining > 0
+ *   'pending'   → no time data  OR  now < first stage start
+ *   'running'   → mobile timer active OR within first stage window
+ *   'delayed'   → stopped manually (processed > 0 but no active timer) OR past first stage window
  *
  * activeStage is always IST-window-based (drives timer + stage badge).
  */
@@ -73,30 +71,34 @@ export function classifyDemand(demand, batchStartMs, activeTimerStage) {
     }
   }
 
-  // 3. Before the batch has even started → upcoming/pending
-  if (now < nonZero[0].startMs) {
-    return { status: 'pending', activeStage: nonZero[0], allStages }
-  }
-
-  // 4. Mobile-app timer active → trust the timer (worker is on it)
+  // 3. Mobile-app timer active → trust the timer (worker is on it)
   if (activeTimerStage) {
     const overrideStage = allStages.find((s) => s.key === activeTimerStage.toLowerCase()) || nonZero[0]
     const stageStatus   = now > overrideStage.endMs ? 'delayed' : 'running'
     return { status: stageStatus, activeStage: overrideStage, allStages }
   }
 
-  // 5. Within a stage time window
+  // 4. No active timer, but partially processed → worker stopped/paused it
+  // It should go to Delayed immediately and not bounce back to In Progress.
+  if (processed > 0) {
+    const active = nonZero.find((s) => now >= s.startMs && now < s.endMs) || nonZero[nonZero.length - 1]
+    return { status: 'delayed', activeStage: active, allStages }
+  }
+
+  // 5. Not started yet (processed === 0).
+  // If time has passed the FIRST stage's deadline, they are delayed.
+  if (now >= nonZero[0].endMs) {
+    const overdueStage = nonZero.find((s) => now >= s.startMs && now < s.endMs) || nonZero[nonZero.length - 1]
+    return { status: 'delayed', activeStage: overdueStage, allStages }
+  }
+
+  // 6. Within the first stage window
   const inWindowStage = nonZero.find((s) => now >= s.startMs && now < s.endMs)
   if (inWindowStage) {
     return { status: 'running', activeStage: inWindowStage, allStages }
   }
 
-  // 6. Past all windows → overdue / delayed
-  if (now >= nonZero[nonZero.length - 1].endMs) {
-    return { status: 'delayed', activeStage: nonZero[nonZero.length - 1], allStages }
-  }
-
-  // 7. Between stage windows → pending on the next upcoming stage
+  // 7. Between stage windows or before first start
   const nextStage = nonZero.find((s) => s.startMs > now)
   return { status: 'pending', activeStage: nextStage || nonZero[0], allStages }
 }
@@ -443,9 +445,11 @@ export default function VegList({ demands = [], activeTimers = [], batchStartMs,
       activeTimer?.processType || null
     )
 
-    // Advance start time for the next item in the queue
-    const totalMins = Number(demand.total_time_minutes) || 0
-    currentStartMs += totalMins * 60 * 1000
+    // Advance start time for the next item in the queue ONLY if this item is still in the active timeline
+    if (classification.status === 'running' || classification.status === 'pending') {
+      const totalMins = Number(demand.total_time_minutes) || 0
+      currentStartMs += totalMins * 60 * 1000
+    }
 
     return { demand, classification, activeTimer }
   })

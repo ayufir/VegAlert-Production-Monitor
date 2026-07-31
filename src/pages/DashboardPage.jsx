@@ -87,9 +87,11 @@ function computeCounts(demands, activeTimers, batchStartMs) {
     else if (status === 'delayed')                    delayed++
     else if (status === 'completed')                  completed++
 
-    // Advance start time for the next item
-    const totalMins = Number(demand.total_time_minutes) || 0
-    currentStartMs += totalMins * 60 * 1000
+    // Advance start time for the next item ONLY if this one is still in the active queue
+    if (status === 'running' || status === 'pending') {
+      const totalMins = Number(demand.total_time_minutes) || 0
+      currentStartMs += totalMins * 60 * 1000
+    }
   }
 
   return { running, delayed, completed }
