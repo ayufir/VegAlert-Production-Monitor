@@ -165,22 +165,20 @@ function LiveCountdown({ endMs }) {
   )
 }
 
-// ─── Timer: delay since stage end ────────────────────────────────────────────
+// ─── Timer: delay static state ───────────────────────────────────────────────
 /**
- * Counts UP from `sinceMs` — shows how long overdue the item is.
+ * Shows a static stopped state for delayed items instead of a running timer.
  */
-function DelayTimer({ sinceMs }) {
-  const [now, setNow] = useState(Date.now)
-  useEffect(() => {
-    const id = setInterval(() => setNow(Date.now()), 1000)
-    return () => clearInterval(id)
-  }, [])
-
-  const elapsed = now - sinceMs
+function DelayTimer({ processed }) {
+  const isStopped = processed > 0
   return (
     <div className="flex flex-col items-end">
-      <span className="text-[10px] font-bold text-red-500 uppercase tracking-wider">Delayed</span>
-      <span className="text-red-500 font-black text-lg font-mono tracking-tight leading-none">+{msToStr(elapsed)}</span>
+      <span className="text-[10px] font-bold text-red-500 uppercase tracking-wider">
+        {isStopped ? 'Paused' : 'Delayed'}
+      </span>
+      <span className="text-red-500 font-black text-[17px] font-mono tracking-tight leading-none">
+        {isStopped ? 'STOPPED' : 'MISSED'}
+      </span>
     </div>
   )
 }
@@ -342,9 +340,9 @@ function VegRow({ demand, classification, idx }) {
           <LiveCountdown endMs={activeStage.endMs} />
         )}
 
-        {/* Delayed: count up from last stage's endMs */}
+        {/* Delayed: show static stopped state */}
         {isDelayed && activeStage && (
-          <DelayTimer sinceMs={activeStage.endMs} />
+          <DelayTimer processed={processed} />
         )}
 
         {/* Pending: show when it will start */}
