@@ -214,25 +214,25 @@ export default function DashboardPage() {
 
         {/* Batch Info Banner */}
         {selectedBatchObj && batchStartMs && (
-          <div className="mt-4 mx-0 sm:mx-0 px-4 py-3 bg-white border border-slate-200 rounded-2xl shadow-sm flex flex-wrap items-center gap-3">
-            <div className="w-8 h-8 rounded-lg bg-emerald-100 flex items-center justify-center text-emerald-600 text-sm font-black shrink-0">
+          <div className="mt-4 mx-0 sm:mx-0 px-4 py-3 bg-[#071A0F] border border-[#11321D] rounded-2xl shadow-sm flex flex-wrap items-center gap-3">
+            <div className="w-8 h-8 rounded-lg bg-[#A3D61B] flex items-center justify-center text-[#071A0F] text-sm font-black shrink-0">
               ℹ
             </div>
             <div>
-              <div className="text-slate-900 font-bold text-sm">
+              <div className="text-white font-bold text-sm">
                 {selectedBatchObj.name || selectedBatchObj.batch_name || 'Batch'}
                 {' '}
-                <span className="text-slate-400 font-medium text-xs">
+                <span className="text-[#A3D61B] opacity-80 font-medium text-xs">
                   {selectedBatchObj.time_range || selectedBatchObj.timeRange || selectedBatchObj.slot || ''}
                 </span>
               </div>
-              <div className="text-slate-500 text-xs mt-0.5">
-                Batch starts at <strong className="text-slate-700">{new Date(batchStartMs).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true })}</strong>
+              <div className="text-slate-300 text-xs mt-0.5">
+                Batch starts at <strong className="text-white">{new Date(batchStartMs).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true })}</strong>
                 {' · '}
-                <strong className="text-slate-700">{batchDemands.length}</strong> vegetables in queue
+                <strong className="text-white">{batchDemands.length}</strong> vegetables in queue
                 {' · '}
-                <strong className="text-emerald-600">{counts.running}</strong> in progress
-                {counts.delayed > 0 && <>{' · '}<strong className="text-red-500">{counts.delayed}</strong> delayed</>}
+                <strong className="text-[#A3D61B]">{counts.running}</strong> in progress
+                {counts.delayed > 0 && <>{' · '}<strong className="text-red-400">{counts.delayed}</strong> delayed</>}
               </div>
             </div>
           </div>

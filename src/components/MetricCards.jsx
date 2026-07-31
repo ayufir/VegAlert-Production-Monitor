@@ -3,10 +3,12 @@ const METRICS = [
     key: 'running',
     label: 'In Progress',
     icon: '▶',
-    iconBg: 'bg-emerald-100',
-    iconColor: 'text-emerald-600',
-    valueColor: 'text-emerald-700',
-    border: 'border-t-emerald-500',
+    iconBg: 'bg-[#A3D61B]',
+    iconColor: 'text-[#071A0F]',
+    valueColor: 'text-white',
+    border: 'border-t-[#A3D61B]',
+    cardBg: 'bg-[#071A0F]',
+    labelColor: 'text-[#A3D61B] opacity-80',
   },
   {
     key: 'delayed',
@@ -16,15 +18,19 @@ const METRICS = [
     iconColor: 'text-red-600',
     valueColor: 'text-red-700',
     border: 'border-t-red-500',
+    cardBg: 'bg-white',
+    labelColor: 'text-slate-500',
   },
   {
     key: 'completed',
     label: 'Completed',
     icon: '✓',
-    iconBg: 'bg-sky-100',
-    iconColor: 'text-sky-600',
-    valueColor: 'text-sky-700',
-    border: 'border-t-sky-500',
+    iconBg: 'bg-[#E3F2CE]',
+    iconColor: 'text-[#071A0F]',
+    valueColor: 'text-[#071A0F]',
+    border: 'border-t-[#071A0F]',
+    cardBg: 'bg-white',
+    labelColor: 'text-slate-500',
   },
 ]
 
@@ -37,10 +43,10 @@ export default function MetricCards({ running = 0, delayed = 0, completed = 0, o
         <button
           key={m.key}
           onClick={() => onTabChange?.(m.key)}
-          className={`glass-card rounded-2xl p-4 border-t-4 ${m.border} shadow-sm hover:shadow-md transition-all active:scale-[0.97] text-left cursor-pointer`}
+          className={`${m.cardBg} rounded-2xl p-4 border-t-4 ${m.border} shadow-sm hover:shadow-md transition-all active:scale-[0.97] text-left cursor-pointer`}
         >
           <div className="flex items-center justify-between mb-3">
-            <span className="text-slate-500 text-xs font-bold uppercase tracking-wider">{m.label}</span>
+            <span className={`${m.labelColor} text-xs font-bold uppercase tracking-wider`}>{m.label}</span>
             <span className={`w-8 h-8 rounded-lg ${m.iconBg} ${m.iconColor} flex items-center justify-center text-base font-black`}>
               {m.icon}
             </span>

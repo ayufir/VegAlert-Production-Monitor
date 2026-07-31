@@ -159,8 +159,8 @@ function LiveCountdown({ endMs }) {
   }
   return (
     <div className="flex flex-col items-end">
-      <span className="text-[10px] font-bold text-emerald-600 uppercase tracking-wider">Remaining</span>
-      <span className="text-emerald-700 font-black text-lg font-mono tracking-tight leading-none">{msToStr(diff)}</span>
+      <span className="text-[10px] font-bold text-[#071A0F] uppercase tracking-wider">Remaining</span>
+      <span className="text-[#071A0F] font-black text-lg font-mono tracking-tight leading-none">{msToStr(diff)}</span>
     </div>
   )
 }
@@ -240,7 +240,7 @@ function VegRow({ demand, classification, idx }) {
         'row-enter px-4 sm:px-5 py-4 border-b border-slate-100 transition-colors relative',
         'flex sm:grid sm:grid-cols-[auto_1fr_160px_100px_120px] flex-wrap sm:flex-nowrap items-center gap-3 sm:gap-4',
         isDelayed   ? 'bg-red-50/70 hover:bg-red-50'         : '',
-        isRunning   ? 'bg-emerald-50/50 hover:bg-emerald-50/90' : '',
+        isRunning   ? 'bg-[#F2FCE3] hover:bg-[#EAFADC]' : '',
         isPending   ? 'bg-white hover:bg-slate-50/70 opacity-70' : '',
         isCompleted ? 'bg-slate-50/60 hover:bg-slate-100/60' : '',
       ].join(' ')}
@@ -252,7 +252,7 @@ function VegRow({ demand, classification, idx }) {
         <div className={[
           'w-1.5 h-1.5 rounded-full',
           isDelayed   ? 'bg-red-500'                : '',
-          isRunning   ? 'bg-emerald-500 animate-pulse' : '',
+          isRunning   ? 'bg-[#A3D61B] animate-pulse' : '',
           isCompleted ? 'bg-sky-400'                : '',
           isPending   ? 'bg-slate-300'              : '',
         ].join(' ')} />
@@ -271,17 +271,17 @@ function VegRow({ demand, classification, idx }) {
             {/* Progress for partially-processed items */}
             {processed > 0 && !isCompleted && (
               <>
-                <span className={isRunning ? 'text-emerald-600 font-semibold' : 'text-slate-500 font-semibold'}>
+                <span className={isRunning ? 'text-[#071A0F] font-semibold' : 'text-slate-500 font-semibold'}>
                   • {processed}/{total} gm done
                 </span>
                 <span className="inline-flex items-center gap-1">
                   <span className="w-14 h-1.5 bg-slate-200 rounded-full overflow-hidden inline-block align-middle">
                     <span
-                      className={`h-full rounded-full block transition-all ${isRunning ? 'bg-emerald-500' : 'bg-slate-400'}`}
+                      className={`h-full rounded-full block transition-all ${isRunning ? 'bg-[#A3D61B]' : 'bg-slate-400'}`}
                       style={{ width: `${progressPct}%` }}
                     />
                   </span>
-                  <span className={`font-bold ${isRunning ? 'text-emerald-600' : 'text-slate-500'}`}>{progressPct}%</span>
+                  <span className={`font-bold ${isRunning ? 'text-[#071A0F]' : 'text-slate-500'}`}>{progressPct}%</span>
                 </span>
               </>
             )}
@@ -368,7 +368,7 @@ function StageMiniBar({ allStages, activeStageKey, status }) {
             key={stg.key}
             className={[
               'h-1 rounded-full transition-all',
-              isActive ? `${stgInfo?.dot || 'bg-emerald-500'} animate-pulse` :
+              isActive ? `${stgInfo?.dot || 'bg-[#A3D61B]'} animate-pulse` :
               isPast   ? 'bg-slate-300' : 'bg-slate-100',
             ].join(' ')}
             style={{ width: `${widthPct}%` }}
@@ -461,7 +461,7 @@ export default function VegList({ demands = [], activeTimers = [], batchStartMs,
       <div className="flex flex-col items-center justify-center py-20 gap-3 text-center">
         <div className={[
           'w-16 h-16 rounded-full flex items-center justify-center text-2xl font-black',
-          tab === 'running'   ? 'bg-emerald-100 text-emerald-600' : '',
+          tab === 'running'   ? 'bg-[#F2FCE3] text-[#071A0F]' : '',
           tab === 'delayed'   ? 'bg-red-100 text-red-500'         : '',
           tab === 'completed' ? 'bg-sky-100 text-sky-600'         : '',
         ].join(' ')}>
