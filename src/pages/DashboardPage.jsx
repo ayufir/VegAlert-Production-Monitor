@@ -181,12 +181,11 @@ export default function DashboardPage() {
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-0 sm:px-6 pb-20">
         {/* Table Header — Desktop */}
-        <div className="hidden sm:grid grid-cols-[auto_1fr_160px_100px_160px_100px] gap-4 px-5 py-3 bg-white border-b border-slate-200 rounded-t-2xl mt-4 mx-0 shadow-sm">
+        <div className="hidden sm:grid grid-cols-[auto_1fr_160px_100px_120px] gap-4 px-5 py-3 bg-white border-b border-slate-200 rounded-t-2xl mt-4 mx-0 shadow-sm">
           <div className="w-7" />
           <span className="text-slate-400 text-xs font-bold uppercase tracking-wider">Vegetable</span>
           <span className="text-slate-400 text-xs font-bold uppercase tracking-wider">Stage</span>
           <span className="text-slate-400 text-xs font-bold uppercase tracking-wider">Total Time</span>
-          <span className="text-slate-400 text-xs font-bold uppercase tracking-wider">Time Window</span>
           <span className="text-slate-400 text-xs font-bold uppercase tracking-wider text-right">Timer</span>
         </div>
 

@@ -238,7 +238,7 @@ function VegRow({ demand, classification, idx }) {
     <div
       className={[
         'row-enter px-4 sm:px-5 py-4 border-b border-slate-100 transition-colors relative',
-        'flex sm:grid sm:grid-cols-[auto_1fr_160px_100px_160px_100px] flex-wrap sm:flex-nowrap items-center gap-3 sm:gap-4',
+        'flex sm:grid sm:grid-cols-[auto_1fr_160px_100px_120px] flex-wrap sm:flex-nowrap items-center gap-3 sm:gap-4',
         isDelayed   ? 'bg-red-50/70 hover:bg-red-50'         : '',
         isRunning   ? 'bg-emerald-50/50 hover:bg-emerald-50/90' : '',
         isPending   ? 'bg-white hover:bg-slate-50/70 opacity-70' : '',
@@ -314,17 +314,7 @@ function VegRow({ demand, classification, idx }) {
         )}
       </div>
 
-      {/* ── Time window ── */}
-      <div className="w-full sm:w-auto mt-2 sm:mt-0 text-left bg-slate-50 sm:bg-transparent p-2 sm:p-0 rounded-lg sm:rounded-none">
-        <div className="text-slate-500 text-[11px] font-bold uppercase tracking-wider">Window</div>
-        {activeStage ? (
-          <div className="text-slate-700 text-sm font-mono font-bold leading-tight">
-            {formatTime(activeStage.startMs)} – {formatTime(activeStage.endMs)}
-          </div>
-        ) : (
-          <div className="text-slate-400 text-sm">--</div>
-        )}
-      </div>
+
 
       {/* ── Timer ── */}
       <div className="absolute sm:relative right-4 top-4 sm:right-auto sm:top-auto text-right">
