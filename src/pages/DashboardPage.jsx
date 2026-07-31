@@ -180,8 +180,34 @@ export default function DashboardPage() {
 
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-0 sm:px-6 pb-20">
+        {/* Batch Info Banner */}
+        {selectedBatchObj && batchStartMs && (
+          <div className="mt-4 mb-2 mx-0 sm:mx-0 px-4 py-3 bg-[#071A0F] border border-[#11321D] rounded-2xl shadow-sm flex flex-wrap items-center gap-3">
+            <div className="w-8 h-8 rounded-lg bg-[#A3D61B] flex items-center justify-center text-[#071A0F] text-sm font-black shrink-0">
+              ℹ
+            </div>
+            <div>
+              <div className="text-white font-bold text-sm">
+                {selectedBatchObj.name || selectedBatchObj.batch_name || 'Batch'}
+                {' '}
+                <span className="text-[#A3D61B] opacity-80 font-medium text-xs">
+                  {selectedBatchObj.time_range || selectedBatchObj.timeRange || selectedBatchObj.slot || ''}
+                </span>
+              </div>
+              <div className="text-slate-300 text-xs mt-0.5">
+                Batch starts at <strong className="text-white">{new Date(batchStartMs).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true })}</strong>
+                {' · '}
+                <strong className="text-white">{batchDemands.length}</strong> vegetables in queue
+                {' · '}
+                <strong className="text-[#A3D61B]">{counts.running}</strong> in progress
+                {counts.delayed > 0 && <>{' · '}<strong className="text-red-400">{counts.delayed}</strong> delayed</>}
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Table Header — Desktop */}
-        <div className="hidden sm:grid grid-cols-[auto_1fr_160px_100px_120px] gap-4 px-5 py-3 bg-white border-b border-slate-200 rounded-t-2xl mt-4 mx-0 shadow-sm">
+        <div className="hidden sm:grid grid-cols-[auto_1fr_160px_100px_120px] gap-4 px-5 py-3 bg-white border-b border-slate-200 rounded-t-2xl mt-2 mx-0 shadow-sm">
           <div className="w-7" />
           <span className="text-slate-400 text-xs font-bold uppercase tracking-wider">Vegetable</span>
           <span className="text-slate-400 text-xs font-bold uppercase tracking-wider">Stage</span>
@@ -212,31 +238,6 @@ export default function DashboardPage() {
           )}
         </div>
 
-        {/* Batch Info Banner */}
-        {selectedBatchObj && batchStartMs && (
-          <div className="mt-4 mx-0 sm:mx-0 px-4 py-3 bg-[#071A0F] border border-[#11321D] rounded-2xl shadow-sm flex flex-wrap items-center gap-3">
-            <div className="w-8 h-8 rounded-lg bg-[#A3D61B] flex items-center justify-center text-[#071A0F] text-sm font-black shrink-0">
-              ℹ
-            </div>
-            <div>
-              <div className="text-white font-bold text-sm">
-                {selectedBatchObj.name || selectedBatchObj.batch_name || 'Batch'}
-                {' '}
-                <span className="text-[#A3D61B] opacity-80 font-medium text-xs">
-                  {selectedBatchObj.time_range || selectedBatchObj.timeRange || selectedBatchObj.slot || ''}
-                </span>
-              </div>
-              <div className="text-slate-300 text-xs mt-0.5">
-                Batch starts at <strong className="text-white">{new Date(batchStartMs).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true })}</strong>
-                {' · '}
-                <strong className="text-white">{batchDemands.length}</strong> vegetables in queue
-                {' · '}
-                <strong className="text-[#A3D61B]">{counts.running}</strong> in progress
-                {counts.delayed > 0 && <>{' · '}<strong className="text-red-400">{counts.delayed}</strong> delayed</>}
-              </div>
-            </div>
-          </div>
-        )}
       </div>
     </div>
   )
