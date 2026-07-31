@@ -1,7 +1,7 @@
 const TABS = [
-  { key: 'running',   label: 'In Progress', icon: '▶', color: 'text-[#071A0F]', activeClass: 'bg-[#071A0F] text-[#A3D61B] border-[#071A0F] shadow-sm' },
-  { key: 'delayed',   label: 'Delayed',     icon: '⚠', color: 'text-red-500',     activeClass: 'bg-red-500 text-white border-red-500 shadow-sm'     },
-  { key: 'completed', label: 'Completed',   icon: '✓', color: 'text-sky-600',     activeClass: 'bg-[#E3F2CE] text-[#071A0F] border-[#E3F2CE] shadow-sm'     },
+  { key: 'running',   label: 'In Progress', icon: '▶', activeClass: 'bg-[#0A1A12] text-white shadow-md' },
+  { key: 'delayed',   label: 'Delayed',     icon: '⚠', activeClass: 'bg-red-500 text-white shadow-md'     },
+  { key: 'completed', label: 'Completed',   icon: '✓', activeClass: 'bg-slate-800 text-white shadow-md'     },
 ]
 
 export default function TabBar({ activeTab, onTabChange, counts = {} }) {
@@ -16,10 +16,10 @@ export default function TabBar({ activeTab, onTabChange, counts = {} }) {
               <button
                 key={tab.key}
                 onClick={() => onTabChange?.(tab.key)}
-                className={`shrink-0 flex items-center gap-2 px-5 py-2.5 rounded-xl border text-base font-bold transition-all active:scale-95
+                className={`shrink-0 flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold transition-all active:scale-95
                   ${isActive
                     ? tab.activeClass
-                    : 'bg-white border-slate-200 text-slate-500 hover:border-slate-300 hover:text-slate-700'
+                    : 'bg-transparent text-slate-500 hover:bg-slate-100 hover:text-slate-900'
                   }`}
               >
                 <span>{tab.icon}</span>
@@ -27,8 +27,8 @@ export default function TabBar({ activeTab, onTabChange, counts = {} }) {
                 {count > 0 && (
                   <span className={`inline-flex items-center justify-center min-w-[24px] h-6 rounded-full text-xs font-black px-2
                     ${isActive 
-                        ? tab.key === 'running' ? 'bg-[#A3D61B]/20 text-[#A3D61B]' : 'bg-white/50 text-current' 
-                        : 'bg-slate-100 text-slate-600'}
+                        ? 'bg-white/20 text-white'
+                        : 'bg-slate-200 text-slate-700'}
                   `}>
                     {count}
                   </span>

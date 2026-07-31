@@ -182,25 +182,32 @@ export default function DashboardPage() {
       <div className="max-w-7xl mx-auto px-0 sm:px-6 pb-20">
         {/* Batch Info Banner */}
         {selectedBatchObj && batchStartMs && (
-          <div className="mt-4 mb-2 mx-0 sm:mx-0 px-4 py-3 bg-[#071A0F] border border-[#11321D] rounded-2xl shadow-sm flex flex-wrap items-center gap-3">
-            <div className="w-8 h-8 rounded-lg bg-[#A3D61B] flex items-center justify-center text-[#071A0F] text-sm font-black shrink-0">
+          <div className="mt-4 mb-2 mx-0 sm:mx-0 px-5 py-4 bg-[#0A1A12] rounded-2xl shadow-xl flex flex-wrap items-center gap-4 relative overflow-hidden">
+            {/* Subtle background decoration */}
+            <div className="absolute right-0 top-0 w-32 h-32 bg-[#A3D61B] opacity-5 blur-3xl rounded-full transform translate-x-1/2 -translate-y-1/2 pointer-events-none" />
+            
+            <div className="w-10 h-10 rounded-xl bg-[#A3D61B] flex items-center justify-center text-[#0A1A12] text-lg font-black shrink-0 relative z-10 shadow-lg shadow-[#A3D61B]/20">
               ℹ
             </div>
-            <div>
-              <div className="text-white font-bold text-sm">
+            <div className="relative z-10">
+              <div className="text-white font-bold text-base flex items-center gap-2">
                 {selectedBatchObj.name || selectedBatchObj.batch_name || 'Batch'}
-                {' '}
-                <span className="text-[#A3D61B] opacity-80 font-medium text-xs">
+                <span className="px-2 py-0.5 rounded-md bg-white/10 text-[#A3D61B] font-semibold text-xs border border-white/5">
                   {selectedBatchObj.time_range || selectedBatchObj.timeRange || selectedBatchObj.slot || ''}
                 </span>
               </div>
-              <div className="text-slate-300 text-xs mt-0.5">
-                Batch starts at <strong className="text-white">{new Date(batchStartMs).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true })}</strong>
-                {' · '}
-                <strong className="text-white">{batchDemands.length}</strong> vegetables in queue
-                {' · '}
-                <strong className="text-[#A3D61B]">{counts.running}</strong> in progress
-                {counts.delayed > 0 && <>{' · '}<strong className="text-red-400">{counts.delayed}</strong> delayed</>}
+              <div className="text-slate-400 text-sm mt-1 flex items-center gap-2 flex-wrap">
+                <span>Starts <strong className="text-white">{new Date(batchStartMs).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true })}</strong></span>
+                <span className="w-1 h-1 rounded-full bg-slate-600" />
+                <span><strong className="text-white">{batchDemands.length}</strong> in queue</span>
+                <span className="w-1 h-1 rounded-full bg-slate-600" />
+                <span><strong className="text-[#A3D61B]">{counts.running}</strong> running</span>
+                {counts.delayed > 0 && (
+                  <>
+                    <span className="w-1 h-1 rounded-full bg-slate-600" />
+                    <span className="text-red-400"><strong>{counts.delayed}</strong> delayed</span>
+                  </>
+                )}
               </div>
             </div>
           </div>

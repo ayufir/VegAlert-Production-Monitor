@@ -3,20 +3,20 @@ const METRICS = [
     key: 'running',
     label: 'In Progress',
     icon: '▶',
-    iconBg: 'bg-[#A3D61B]',
-    iconColor: 'text-[#071A0F]',
-    valueColor: 'text-white',
+    iconBg: 'bg-[#F2FCE3]',
+    iconColor: 'text-[#4D7C0F]',
+    valueColor: 'text-slate-900',
     border: 'border-t-[#A3D61B]',
-    cardBg: 'bg-[#071A0F]',
-    labelColor: 'text-[#A3D61B] opacity-80',
+    cardBg: 'bg-white',
+    labelColor: 'text-slate-500',
   },
   {
     key: 'delayed',
     label: 'Delayed',
     icon: '⚠',
-    iconBg: 'bg-red-100',
+    iconBg: 'bg-red-50',
     iconColor: 'text-red-600',
-    valueColor: 'text-red-700',
+    valueColor: 'text-slate-900',
     border: 'border-t-red-500',
     cardBg: 'bg-white',
     labelColor: 'text-slate-500',
@@ -25,10 +25,10 @@ const METRICS = [
     key: 'completed',
     label: 'Completed',
     icon: '✓',
-    iconBg: 'bg-[#E3F2CE]',
-    iconColor: 'text-[#071A0F]',
-    valueColor: 'text-[#071A0F]',
-    border: 'border-t-[#071A0F]',
+    iconBg: 'bg-slate-100',
+    iconColor: 'text-slate-600',
+    valueColor: 'text-slate-900',
+    border: 'border-t-slate-300',
     cardBg: 'bg-white',
     labelColor: 'text-slate-500',
   },
@@ -43,8 +43,9 @@ export default function MetricCards({ running = 0, delayed = 0, completed = 0, o
         <button
           key={m.key}
           onClick={() => onTabChange?.(m.key)}
-          className={`${m.cardBg} rounded-2xl p-4 border-t-4 ${m.border} shadow-sm hover:shadow-md transition-all active:scale-[0.97] text-left cursor-pointer`}
+          className={`${m.cardBg} rounded-2xl p-4 border border-slate-200/80 shadow-sm hover:shadow-md transition-all active:scale-[0.97] text-left cursor-pointer relative overflow-hidden`}
         >
+          <div className={`absolute top-0 left-0 w-full h-1 ${m.border}`} />
           <div className="flex items-center justify-between mb-3">
             <span className={`${m.labelColor} text-xs font-bold uppercase tracking-wider`}>{m.label}</span>
             <span className={`w-8 h-8 rounded-lg ${m.iconBg} ${m.iconColor} flex items-center justify-center text-base font-black`}>
