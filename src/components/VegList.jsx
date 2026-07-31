@@ -238,7 +238,7 @@ function VegRow({ demand, classification, idx }) {
     <div
       className={[
         'row-enter px-4 sm:px-5 py-4 border-b border-slate-100 transition-colors relative',
-        'flex sm:grid sm:grid-cols-[auto_1fr_160px_100px_120px] flex-wrap sm:flex-nowrap items-center gap-3 sm:gap-4',
+        'flex sm:grid sm:grid-cols-[1fr_160px_100px_120px] flex-wrap sm:flex-nowrap items-center gap-3 sm:gap-4',
         isDelayed   ? 'bg-red-50/70 hover:bg-red-50'         : '',
         isRunning   ? 'bg-[#F2FCE3] hover:bg-[#EAFADC]' : '',
         isPending   ? 'bg-white hover:bg-slate-50/70 opacity-70' : '',
@@ -246,16 +246,7 @@ function VegRow({ demand, classification, idx }) {
       ].join(' ')}
       style={{ animationDelay: `${idx * 0.04}s` }}
     >
-      {/* ── Index + pulse dot ── */}
-      <div className="flex flex-col items-center gap-0.5 shrink-0 w-6 sm:w-7 self-start sm:self-auto mt-1 sm:mt-0">
-        <div className={[
-          'w-1.5 h-1.5 rounded-full',
-          isDelayed   ? 'bg-red-500'                : '',
-          isRunning   ? 'bg-[#A3D61B] animate-pulse' : '',
-          isCompleted ? 'bg-sky-400'                : '',
-          isPending   ? 'bg-slate-300'              : '',
-        ].join(' ')} />
-      </div>
+
 
       {/* ── Name + quantity + progress ── */}
       <div className="flex items-start sm:items-center gap-3 flex-1 sm:flex-none min-w-[200px] sm:min-w-0 w-full sm:w-auto">
