@@ -248,7 +248,6 @@ function VegRow({ demand, classification, idx }) {
     >
       {/* ── Index + pulse dot ── */}
       <div className="flex flex-col items-center gap-0.5 shrink-0 w-6 sm:w-7 self-start sm:self-auto mt-1 sm:mt-0">
-        <span className="text-slate-300 text-xs font-bold tabular-nums">{idx + 1}</span>
         <div className={[
           'w-1.5 h-1.5 rounded-full',
           isDelayed   ? 'bg-red-500'                : '',
