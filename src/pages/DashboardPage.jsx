@@ -3,9 +3,9 @@ import { useNavigate } from 'react-router-dom'
 import Header from '../components/Header'
 import MetricCards from '../components/MetricCards'
 import TabBar from '../components/TabBar'
-import VegList, { getDemandStatus } from '../components/VegList'
-import { useLiveTimers } from '../hooks/useLiveTimers'
-import { useBatches, useBatchDemands } from '../hooks/useBatches'
+import VegList, { getDemandStatus, classifyDemand } from '../components/VegList'
+import { useProcessingLogs } from '../hooks/useProcessingLogs'
+import { useBatches } from '../hooks/useBatches'
 
 // Convert batch time string like "9:00 AM" or "09:00" to a timestamp in ms on selectedDate
 function parseBatchStartTime(batch, selectedDate) {
@@ -61,40 +61,23 @@ function parseBatchStartTime(batch, selectedDate) {
   return baseDate.getTime()
 }
 
-// Compute per-demand status using IST real-time vs stage windows (mirrors VegList logic)
-function computeCounts(demands, activeTimers, batchStartMs) {
-  if (demands.length === 0 || !batchStartMs) return { running: 0, delayed: 0, completed: 0, pending: 0 }
-
-  // Build timer lookup (mobile app timers)
-  const timerMap = new Map()
-  activeTimers.forEach((t) => {
-    if (t.productId) timerMap.set(String(t.productId), t)
-    if (t.productName) timerMap.set((t.productName || '').toLowerCase().trim(), t)
-  })
-
-  let running = 0, delayed = 0, completed = 0
-  let currentStartMs = batchStartMs
-
-  for (const demand of demands) {
-    const activeTimer =
-      timerMap.get(String(demand.product_id)) ||
-      timerMap.get((demand.product_name || '').toLowerCase().trim())
-
-    const status = getDemandStatus(demand, currentStartMs, activeTimer?.processType || null)
-
-    // Combine running and pending into the "In Progress" count
-    if (status === 'running' || status === 'pending') running++
-    else if (status === 'delayed')                    delayed++
-    else if (status === 'completed')                  completed++
-
-    // Advance start time for the next item ONLY if this one is still in the active queue
-    if (status === 'running' || status === 'pending') {
-      const totalMins = Number(demand.total_time_minutes) || 0
-      currentStartMs += totalMins * 60 * 1000
+function computeCounts(logs) {
+  const counts = { soaking: 0, cleaning: 0, cutting: 0, drying: 0, weighting: 0, running: 0, pending: 0, delayed: 0, completed: 0 }
+  
+  for (const log of logs) {
+    const stageKey = log.process_type
+    if (stageKey && counts[stageKey] !== undefined) {
+      counts[stageKey]++
+    }
+    
+    if (log.start_time && !log.end_time) {
+      counts.running++
+    } else if (log.end_time) {
+      counts.completed++
     }
   }
 
-  return { running, delayed, completed }
+  return counts
 }
 
 export default function DashboardPage() {
@@ -110,17 +93,42 @@ export default function DashboardPage() {
   const today = new Date().toISOString().split('T')[0]
   const [selectedDate, setSelectedDate] = useState(today)
   const [selectedBatch, setSelectedBatch] = useState('ALL')
-  const [activeTab, setActiveTab] = useState('running')
+  const [activeTab, setActiveTab] = useState('soaking')
+  const [statusFilter, setStatusFilter] = useState('ALL')
 
   // Data hooks
+  // Data hooks
   const { data: batches = [] } = useBatches()
-  const { data: batchDemands = [], isLoading: demandsLoading } = useBatchDemands(
-    selectedBatch !== 'ALL' ? selectedBatch : null,
-    selectedDate
-  )
-  const { activeTimers, isLoading: timersLoading } = useLiveTimers(selectedBatch)
+  const { data: rawLogs = [], isLoading } = useProcessingLogs(selectedDate)
 
-  const isLoading = demandsLoading || timersLoading
+  // Flatten processing logs
+  const allLogs = useMemo(() => {
+    const flat = []
+    rawLogs.forEach(product => {
+      if (product.processes) {
+        Object.keys(product.processes).forEach(processType => {
+          product.processes[processType].forEach(log => {
+            flat.push({
+              ...log,
+              product_id: product.product_id,
+              product_name: product.product_name,
+              hindi_name: product.hindi_name,
+              image_url: product.image_url,
+              unit: product.unit,
+            })
+          })
+        })
+      }
+    })
+    // Sort by id or start time desc
+    return flat.sort((a, b) => b.id - a.id)
+  }, [rawLogs])
+
+  // Filter logs by selected batch
+  const batchLogs = useMemo(() => {
+    if (selectedBatch === 'ALL') return allLogs
+    return allLogs.filter(log => String(log.batch_id) === selectedBatch)
+  }, [allLogs, selectedBatch])
 
   // Auto-select first batch if none selected
   useEffect(() => {
@@ -139,11 +147,8 @@ export default function DashboardPage() {
   const [demoStartMs] = useState(Date.now())
   const batchStartMs = demoStartMs
 
-  // Counts for tab badges and metric cards — uses same IST logic as VegList
-  const counts = useMemo(() =>
-    computeCounts(batchDemands, activeTimers, batchStartMs),
-    [batchDemands, activeTimers, batchStartMs]
-  )
+  // Counts for tab badges
+  const counts = useMemo(() => computeCounts(batchLogs), [batchLogs])
 
   const handleLogout = () => {
     localStorage.removeItem('accessToken')
@@ -167,13 +172,15 @@ export default function DashboardPage() {
         onDateChange={setSelectedDate}
       />
 
-      {/* Metric Cards */}
+      {/* Metric Cards (Hidden as per request) */}
+      {/* 
       <MetricCards
         running={counts.running}
         delayed={counts.delayed}
         completed={counts.completed}
         onTabChange={setActiveTab}
       />
+      */}
 
       {/* Tab Bar */}
       <TabBar activeTab={activeTab} onTabChange={setActiveTab} counts={counts} />
@@ -182,30 +189,45 @@ export default function DashboardPage() {
       <div className="max-w-7xl mx-auto px-0 sm:px-6 pb-20">
         {/* Batch Info Banner */}
         {selectedBatchObj && batchStartMs && (
-          <div className="mt-4 mb-2 mx-0 sm:mx-0 px-5 py-4 bg-[#0A1A12] rounded-2xl shadow-xl flex flex-wrap items-center gap-4 relative overflow-hidden">
+          <div className="mt-4 mb-2 mx-0 sm:mx-0 px-5 py-4 bg-white border border-slate-200 rounded-2xl shadow-sm flex flex-wrap items-center gap-4 relative overflow-hidden">
             {/* Subtle background decoration */}
-            <div className="absolute right-0 top-0 w-32 h-32 bg-[#A3D61B] opacity-5 blur-3xl rounded-full transform translate-x-1/2 -translate-y-1/2 pointer-events-none" />
+            <div className="absolute right-0 top-0 w-32 h-32 bg-blue-100 opacity-50 blur-3xl rounded-full transform translate-x-1/2 -translate-y-1/2 pointer-events-none" />
             
-            <div className="w-10 h-10 rounded-xl bg-[#A3D61B] flex items-center justify-center text-[#0A1A12] text-lg font-black shrink-0 relative z-10 shadow-lg shadow-[#A3D61B]/20">
+            <div className="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center text-blue-600 text-lg font-black shrink-0 relative z-10 border border-blue-100">
               ℹ
             </div>
             <div className="relative z-10">
-              <div className="text-white font-bold text-base flex items-center gap-2">
+              <div className="text-slate-800 font-bold text-base flex items-center gap-2">
                 {selectedBatchObj.name || selectedBatchObj.batch_name || 'Batch'}
-                <span className="px-2 py-0.5 rounded-md bg-white/10 text-[#A3D61B] font-semibold text-xs border border-white/5">
+                <span className="px-2 py-0.5 rounded-md bg-blue-50 text-blue-700 font-semibold text-xs border border-blue-100">
                   {selectedBatchObj.time_range || selectedBatchObj.timeRange || selectedBatchObj.slot || ''}
                 </span>
               </div>
-              <div className="text-slate-400 text-sm mt-1 flex items-center gap-2 flex-wrap">
-                <span>Starts <strong className="text-white">{new Date(batchStartMs).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true })}</strong></span>
-                <span className="w-1 h-1 rounded-full bg-slate-600" />
-                <span><strong className="text-white">{batchDemands.length}</strong> in queue</span>
-                <span className="w-1 h-1 rounded-full bg-slate-600" />
-                <span><strong className="text-[#A3D61B]">{counts.running}</strong> running</span>
+              <div className="text-slate-500 text-sm mt-1 flex items-center gap-2 flex-wrap">
+                <span>Starts <strong className="text-slate-700">{new Date(batchStartMs).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true })}</strong></span>
+                <span className="w-1 h-1 rounded-full bg-slate-300" />
+                <span 
+                  className={`cursor-pointer transition-colors px-2 py-0.5 rounded-md -ml-2 ${statusFilter === 'ALL' ? 'bg-slate-100 text-slate-800' : 'text-slate-500 hover:text-slate-700 hover:bg-slate-50'}`}
+                  onClick={() => setStatusFilter('ALL')}
+                >
+                  <strong className={statusFilter === 'ALL' ? 'text-slate-800' : 'text-slate-600'}>{batchLogs.length}</strong> tasks
+                </span>
+                <span className="w-1 h-1 rounded-full bg-slate-300" />
+                <span 
+                  className={`cursor-pointer transition-colors px-2 py-0.5 rounded-md -mx-2 ${statusFilter === 'running' ? 'bg-blue-50 text-blue-700 ring-1 ring-blue-200' : 'hover:bg-slate-50 text-slate-500 hover:text-slate-700'}`}
+                  onClick={() => setStatusFilter(prev => prev === 'running' ? 'ALL' : 'running')}
+                >
+                  <strong className="text-blue-600">{counts.running}</strong> running
+                </span>
                 {counts.delayed > 0 && (
                   <>
-                    <span className="w-1 h-1 rounded-full bg-slate-600" />
-                    <span className="text-red-400"><strong>{counts.delayed}</strong> delayed</span>
+                    <span className="w-1 h-1 rounded-full bg-slate-300" />
+                    <span 
+                      className={`cursor-pointer transition-colors px-2 py-0.5 rounded-md -mx-2 ${statusFilter === 'delayed' ? 'bg-red-50 text-red-600 ring-1 ring-red-200' : 'text-red-500/80 hover:bg-red-50 hover:text-red-600'}`}
+                      onClick={() => setStatusFilter(prev => prev === 'delayed' ? 'ALL' : 'delayed')}
+                    >
+                      <strong>{counts.delayed}</strong> delayed
+                    </span>
                   </>
                 )}
               </div>
@@ -236,10 +258,9 @@ export default function DashboardPage() {
             </div>
           ) : (
             <VegList 
-              demands={batchDemands} 
-              activeTimers={activeTimers} 
-              batchStartMs={batchStartMs} 
-              tab={activeTab} 
+              logs={batchLogs} 
+              tab={activeTab}
+              statusFilter={statusFilter}
             />
           )}
         </div>

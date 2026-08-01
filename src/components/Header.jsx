@@ -22,25 +22,25 @@ export default function Header({ user = {}, onLogout, selectedBatch, batches = [
   const dateStr = now.toLocaleDateString('en-IN', { weekday: 'short', month: 'short', day: 'numeric' })
 
   return (
-    <header className="bg-[#0A1A12] shadow-sm sticky top-0 z-50">
+    <header className="bg-slate-900 shadow-sm sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         {/* Top Row */}
         <div className="flex items-center justify-between h-14 sm:h-16 gap-3">
           {/* Logo */}
           <div className="flex items-center gap-3 shrink-0">
-            <div className="w-9 h-9 rounded-xl bg-[#A3D61B] flex items-center justify-center text-lg shadow-sm shrink-0">
+            <div className="w-9 h-9 rounded-xl bg-blue-600 flex items-center justify-center text-lg shadow-sm shrink-0">
               🥬
             </div>
             <div className="hidden sm:block">
               <div className="text-white font-black text-xl tracking-tight leading-none">VegAlert</div>
-              <div className="text-[#A3D61B] text-xs font-bold leading-none mt-1">Production Monitor</div>
+              <div className="text-blue-400 text-xs font-bold leading-none mt-1">Production Monitor</div>
             </div>
           </div>
 
           {/* Live badge */}
           <div className="hidden md:flex items-center gap-1.5 bg-white/5 border border-white/5 rounded-full px-3 py-1">
-            <div className="live-dot w-2 h-2 rounded-full bg-[#A3D61B]" />
-            <span className="text-[#A3D61B] text-sm font-bold uppercase tracking-wider">Live</span>
+            <div className="live-dot w-2 h-2 rounded-full bg-blue-500" />
+            <span className="text-blue-400 text-sm font-bold uppercase tracking-wider">Live</span>
           </div>
 
           {/* Clock */}
@@ -51,15 +51,15 @@ export default function Header({ user = {}, onLogout, selectedBatch, batches = [
               <span>{pad(m)}</span>
               <span className="timer-colon text-white/20">:</span>
               <span className="text-slate-300 text-lg">{pad(s)}</span>
-              <span className="text-sm text-[#A3D61B] font-bold ml-1">{ampm}</span>
+              <span className="text-sm text-blue-400 font-bold ml-1">{ampm}</span>
             </div>
-            <div className="text-[#A3D61B] opacity-80 text-xs font-medium">{dateStr}</div>
+            <div className="text-blue-400 opacity-80 text-xs font-medium">{dateStr}</div>
           </div>
 
           {/* User + Logout */}
           <div className="flex items-center gap-2">
             <div className="hidden sm:flex items-center gap-2 bg-white/5 border border-white/5 rounded-xl px-3 py-1.5">
-              <div className="w-6 h-6 rounded-full bg-[#A3D61B] flex items-center justify-center text-xs font-black text-[#0A1A12]">
+              <div className="w-6 h-6 rounded-full bg-blue-600 flex items-center justify-center text-xs font-black text-white">
                 {(user.name || user.email || 'S').charAt(0).toUpperCase()}
               </div>
               <span className="text-white text-sm font-semibold max-w-[120px] truncate">
@@ -107,12 +107,12 @@ export default function Header({ user = {}, onLogout, selectedBatch, batches = [
 
           {/* Batch pills */}
           <div className="flex items-center gap-1.5 overflow-x-auto">
-            <span className="text-[#A3D61B] opacity-80 text-xs font-bold uppercase tracking-wider shrink-0">Batch:</span>
+            <span className="text-blue-400 opacity-80 text-xs font-bold uppercase tracking-wider shrink-0">Batch:</span>
             <button
               onClick={() => onBatchChange?.('ALL')}
               className={`shrink-0 px-4 py-2 rounded-lg text-sm font-bold transition-all border ${
                 selectedBatch === 'ALL'
-                  ? 'bg-[#A3D61B] border-[#A3D61B] text-[#0A1A12] shadow-sm'
+                  ? 'bg-blue-600 border-blue-600 text-white shadow-sm'
                   : 'bg-white/5 border-white/5 text-slate-300 hover:bg-white/10 hover:text-white'
               }`}
             >
@@ -129,7 +129,7 @@ export default function Header({ user = {}, onLogout, selectedBatch, batches = [
                   onClick={() => onBatchChange?.(bid)}
                   className={`shrink-0 px-4 py-2 rounded-lg text-sm font-bold transition-all border ${
                     isActive
-                      ? 'bg-[#A3D61B] border-[#A3D61B] text-[#0A1A12] shadow-sm'
+                      ? 'bg-blue-600 border-blue-600 text-white shadow-sm'
                       : 'bg-white/5 border-white/5 text-slate-300 hover:bg-white/10 hover:text-white'
                   }`}
                 >

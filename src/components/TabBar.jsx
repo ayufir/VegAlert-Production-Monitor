@@ -1,7 +1,9 @@
 const TABS = [
-  { key: 'running',   label: 'In Progress', icon: '▶', activeClass: 'bg-[#0A1A12] text-white shadow-md' },
-  { key: 'delayed',   label: 'Delayed',     icon: '⚠', activeClass: 'bg-red-500 text-white shadow-md'     },
-  { key: 'completed', label: 'Completed',   icon: '✓', activeClass: 'bg-slate-800 text-white shadow-md'     },
+  { key: 'soaking',   label: 'Soaking',   icon: '🧼', activeClass: 'bg-blue-600 text-white shadow-md' },
+  { key: 'cleaning',  label: 'Cleaning',  icon: '🧽', activeClass: 'bg-emerald-600 text-white shadow-md' },
+  { key: 'cutting',   label: 'Cutting',   icon: '🔪', activeClass: 'bg-amber-600 text-white shadow-md' },
+  { key: 'drying',    label: 'Drying',    icon: '💨', activeClass: 'bg-purple-600 text-white shadow-md' },
+  { key: 'weighting', label: 'Weighting', icon: '⚖️', activeClass: 'bg-rose-600 text-white shadow-md' },
 ]
 
 export default function TabBar({ activeTab, onTabChange, counts = {} }) {

@@ -47,10 +47,10 @@ export function useLiveTimers(batchId) {
     queryKey: ['timers-active', batchId],
     queryFn: async () => {
       try {
-        const params = batchId && batchId !== 'ALL' ? { batchId } : {}
-        let rawList = []
-
-        // Removed unnecessary API polling as requested by user
+        // Fetch ALL active timers. VegList matches by productId/productName anyway, 
+        // which avoids issues if a timer was created without a batch_id
+        const res = await api.get('/api/timers/active')
+        let rawList = res.data?.timers || []
 
         // Also fetch any local active timers saved in localStorage
         let localTimers = []
@@ -72,8 +72,8 @@ export function useLiveTimers(batchId) {
         return []
       }
     },
+    refetchInterval: 2000, // Poll every 2 seconds for real-time sync with mobile app
     retry: false,
-    staleTime: Infinity,
   })
 
   /**
