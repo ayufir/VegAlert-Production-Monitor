@@ -121,29 +121,47 @@ function formatExpectedTime(mins) {
   return `${s}s`
 }
 
-function LiveCountdown({ startMs, expectedMs }) {
+function LiveCountdown({ startMs, expectedMs = 0 }) {
   const [now, setNow] = useState(Date.now)
   useEffect(() => {
     const id = setInterval(() => setNow(Date.now()), 1000)
     return () => clearInterval(id)
   }, [])
 
-  const diff = now - startMs
-  const isOverTime = expectedMs > 0 && diff > expectedMs
+  // If expectedMs is not provided or 0, fallback to 5 mins (300,000 ms)
+  const targetDurationMs = expectedMs > 0 ? expectedMs : 5 * 60 * 1000
+  const targetEndMs = startMs + targetDurationMs
+  const remainingMs = targetEndMs - now
+  const isOverTime = remainingMs <= 0
+  const nearCompletion = remainingMs > 0 && remainingMs <= 120000
 
   if (isOverTime) {
+    const overTimeMs = Math.abs(remainingMs)
     return (
       <div className="flex flex-col items-end">
-        <span className="text-[10px] font-bold text-red-500 uppercase tracking-wider animate-pulse">Overtime</span>
-        <span className="text-red-500 font-black text-lg font-mono tracking-tight leading-none animate-pulse">{msToStr(diff)}</span>
+        <span className="text-[10px] font-bold text-red-500 uppercase tracking-wider animate-pulse flex items-center gap-1">
+          <span>🚨</span> Overtime
+        </span>
+        <span className="text-red-500 font-black text-lg font-mono tracking-tight leading-none animate-pulse">
+          +{msToStr(overTimeMs)}
+        </span>
       </div>
     )
   }
 
   return (
     <div className="flex flex-col items-end">
-      <span className="text-[10px] font-bold text-emerald-600 uppercase tracking-wider">Running Time</span>
-      <span className="text-emerald-600 font-black text-lg font-mono tracking-tight leading-none">{msToStr(diff)}</span>
+      <span className={`text-[10px] font-bold uppercase tracking-wider flex items-center gap-1 ${
+        nearCompletion ? 'text-amber-600' : 'text-emerald-600'
+      }`}>
+        <span>{nearCompletion ? '⚡' : '⏳'}</span>
+        {nearCompletion ? 'Near End' : 'Remaining'}
+      </span>
+      <span className={`font-black text-lg font-mono tracking-tight leading-none ${
+        nearCompletion ? 'text-amber-600' : 'text-emerald-600'
+      }`}>
+        {msToStr(remainingMs)}
+      </span>
     </div>
   )
 }
@@ -157,8 +175,8 @@ function VegRow({ log, idx }) {
 
   const processed = Number(log.processed_qty_gm ?? 0)
   
-  const expectedMins = Number(log.expected_time_taken_minutes) || 0
-  const expectedMs = expectedMins * 60 * 1000
+  const expectedMins = Number(log.expected_time_taken_minutes) || Number(log.duration_minutes) || (log.duration_seconds ? Math.round(log.duration_seconds / 60) : 0) || 0
+  const expectedMs = expectedMins > 0 ? expectedMins * 60 * 1000 : 5 * 60 * 1000
 
   const actualMins = Number(log.time_taken_minutes) || 0
 
