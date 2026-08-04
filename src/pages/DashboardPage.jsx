@@ -101,13 +101,44 @@ export default function DashboardPage() {
   const { data: batches = [] } = useBatches()
   const { data: rawLogs = [], isLoading } = useProcessingLogs(selectedDate)
 
-  // Flatten processing logs
+  // Auto-update date when a new day arrives
+  useEffect(() => {
+    const timer = setInterval(() => {
+      const liveToday = new Date().toISOString().split('T')[0]
+      setSelectedDate((prev) => (prev !== liveToday ? liveToday : prev))
+    }, 30000)
+    return () => clearInterval(timer)
+  }, [])
+
+  // Flatten processing logs (ignoring old abandoned overtime logs and empty 0s unstarted rows)
   const allLogs = useMemo(() => {
     const flat = []
+    const now = Date.now()
     rawLogs.forEach(product => {
       if (product.processes) {
         Object.keys(product.processes).forEach(processType => {
           product.processes[processType].forEach(log => {
+            const isRunning = log.start_time && !log.end_time
+            const isCompleted = !!log.end_time
+            const startMs = log.start_time ? new Date(log.start_time).getTime() : null
+            const expectedMins = Number(log.expected_time_taken_minutes) || 0
+            const expectedMs = expectedMins > 0 ? expectedMins * 60 * 1000 : 5 * 60 * 1000
+
+            // 1. Skip dummy unstarted rows that have 0 expected time
+            if (!isRunning && !isCompleted && expectedMins <= 0) {
+              return
+            }
+
+            // 2. Skip abandoned overtime logs (e.g. overtime > 3 mins or running > 15 mins)
+            if (isRunning && startMs) {
+              const elapsed = now - startMs
+              const overtime = elapsed - expectedMs
+              const isAbandoned = overtime > Math.max(180000, expectedMs * 2) || elapsed > 15 * 60 * 1000
+              if (isAbandoned) {
+                return
+              }
+            }
+
             flat.push({
               ...log,
               product_id: product.product_id,

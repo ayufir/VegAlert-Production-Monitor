@@ -180,13 +180,22 @@ function VegRow({ log, idx }) {
 
   const actualMins = Number(log.time_taken_minutes) || 0
 
+  // Check if task was cancelled/stopped mid-way before full expected duration
+  const isCancelled =
+    log.status === 'cancelled' ||
+    log.status === 'stopped' ||
+    log.status === 'aborted' ||
+    log.is_cancelled === true ||
+    log.type === 'cancel' ||
+    Boolean(isCompleted && expectedMins > 0.15 && actualMins < (expectedMins * 0.85))
+
   return (
     <div
       className={[
         'row-enter px-4 sm:px-5 py-4 border-b border-slate-100 transition-colors relative',
         'flex sm:grid sm:grid-cols-[1fr_160px_100px_120px] flex-wrap sm:flex-nowrap items-center gap-3 sm:gap-4',
         isRunning   ? 'bg-blue-50/50 hover:bg-blue-50' : '',
-        isCompleted ? 'bg-slate-50/60 hover:bg-slate-100/60' : '',
+        isCancelled ? 'bg-rose-50/30 hover:bg-rose-50/60' : (isCompleted ? 'bg-slate-50/60 hover:bg-slate-100/60' : ''),
       ].join(' ')}
       style={{ animationDelay: `${idx * 0.04}s` }}
     >
@@ -225,9 +234,10 @@ function VegRow({ log, idx }) {
       <div className="w-1/3 sm:w-auto mt-2 sm:mt-0 text-left text-slate-700 font-bold text-sm">
         {isCompleted ? (
           <div className="flex flex-col">
-            <span>
+            <span className={isCancelled ? "text-rose-600 font-bold" : ""}>
               {Math.floor(actualMins)}<span className="text-xs text-slate-400 font-medium mx-0.5">m</span>
               {Math.round((actualMins % 1) * 60)}<span className="text-xs text-slate-400 font-medium ml-0.5">s</span>
+              {isCancelled && <span className="text-[10px] text-rose-500 font-semibold ml-1.5">(Stopped)</span>}
             </span>
             <span className="text-[10px] text-slate-400 font-medium leading-none mt-1">Expected: {formatExpectedTime(expectedMins)}</span>
           </div>
@@ -241,9 +251,20 @@ function VegRow({ log, idx }) {
 
       {/* ── Timer ── */}
       <div className="absolute sm:relative right-4 top-4 sm:right-auto sm:top-auto text-right">
-        {isCompleted ? (
+        {isCancelled ? (
           <div className="flex flex-col items-end">
-            <span className="text-[10px] font-bold text-sky-600 uppercase tracking-wider">Completed</span>
+            <span className="text-[10px] font-bold text-rose-600 bg-rose-50 border border-rose-200 px-2 py-0.5 rounded-md uppercase tracking-wider">
+              Cancelled
+            </span>
+            <span className="text-slate-500 font-bold text-xs mt-1">
+              At {formatTime(new Date(log.end_time).getTime())}
+            </span>
+          </div>
+        ) : isCompleted ? (
+          <div className="flex flex-col items-end">
+            <span className="text-[10px] font-bold text-sky-600 bg-sky-50 border border-sky-200 px-2 py-0.5 rounded-md uppercase tracking-wider">
+              Completed
+            </span>
             <span className="text-slate-500 font-bold text-xs mt-1">
               At {formatTime(new Date(log.end_time).getTime())}
             </span>
