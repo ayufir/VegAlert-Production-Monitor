@@ -110,6 +110,17 @@ function getVegEmoji(name = '') {
   return Object.entries(VEG_EMOJIS).find(([k]) => lower.includes(k))?.[1] || '🥗'
 }
 
+function formatExpectedTime(mins) {
+  const num = Number(mins) || 0
+  if (num <= 0) return '0s'
+  const totalSecs = Math.round(num * 60)
+  const m = Math.floor(totalSecs / 60)
+  const s = totalSecs % 60
+  if (m > 0 && s > 0) return `${m}m ${s}s`
+  if (m > 0) return `${m}m`
+  return `${s}s`
+}
+
 function LiveCountdown({ startMs, expectedMs }) {
   const [now, setNow] = useState(Date.now)
   useEffect(() => {
@@ -200,12 +211,12 @@ function VegRow({ log, idx }) {
               {Math.floor(actualMins)}<span className="text-xs text-slate-400 font-medium mx-0.5">m</span>
               {Math.round((actualMins % 1) * 60)}<span className="text-xs text-slate-400 font-medium ml-0.5">s</span>
             </span>
-            <span className="text-[10px] text-slate-400 font-medium leading-none mt-1">Expected: {expectedMins}m</span>
+            <span className="text-[10px] text-slate-400 font-medium leading-none mt-1">Expected: {formatExpectedTime(expectedMins)}</span>
           </div>
         ) : (
           <div className="flex flex-col">
-             <span className="text-slate-400">Running...</span>
-             <span className="text-[10px] text-slate-400 font-medium leading-none mt-1">Expected: {expectedMins}m</span>
+              <span className="text-slate-400">Running...</span>
+              <span className="text-[10px] text-slate-400 font-medium leading-none mt-1">Expected: {formatExpectedTime(expectedMins)}</span>
           </div>
         )}
       </div>
